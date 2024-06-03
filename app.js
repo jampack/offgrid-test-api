@@ -14,9 +14,8 @@ const databaseService = new DatabaseService();
 
 let socket = new Server(httpServer, {
     cors: {
-        origin: '*', // Allow all origins
-    },
-    transports: ['websocket']
+        origin: '*',
+    }
 });
 
 app.get('/health', (req, res) => {
