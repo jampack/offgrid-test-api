@@ -1,0 +1,24 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "supervisor app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@influxdata/influxdb-client": "^1.33.2",
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5",
+    "systeminformation": "^5.22.10"
+  },
+  "devDependencies": {
+    "@influxdata/influxdb-client-apis": "^1.33.2",
+    "supervisor": "^0.12.0"
+  }
+}
