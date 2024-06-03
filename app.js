@@ -35,7 +35,6 @@ const startDataCollection = () => {
 const startServer = () => {
     startDataCollection();
     httpServer.listen(port, () => {
-        console.clear();
         console.log(`Server running on port ${port}`);
         console.log('url:', `http://localhost:${port}`);
         console.log('ws:', `ws://localhost:${port}`);
