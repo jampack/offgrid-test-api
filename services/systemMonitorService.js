@@ -17,7 +17,7 @@ class SystemMonitorService {
     }
 
     performanceData() {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve) => {
             let kbToGb = 1024 * 1024 * 1024; // 1024^3 kilobytes = 1 Gigabyte
 
             // Returns file system stats
@@ -48,26 +48,20 @@ class SystemMonitorService {
                 };
             });
 
-            // Returns the name of the operating system
             const osType = os.type();
-            // Returns the uptime of the operating system, in seconds
             const upTime = os.uptime();
-            // Returns the number of free memory of the system in bytes
             const freeMem = os.freemem();
-            // Returns the number of total memory of the system in bytes
             const totalMem = os.totalmem();
-
-            // Calculated memory usage
             const usedMem = totalMem - freeMem;
             const memUsage = ((100 * usedMem) / totalMem).toFixed(1);
 
             // Note: every core runs on 2 threads
             // Returns an array of objects containing information about the computer's CPUs
-            const cpus = os.cpus(); // Returns static data
-            const cpuModel = cpus[0].model; // CPU type
-            const numCores = cpus.length; // Number of cores
-            const cpuUsage = cpus.map((core) => core.times); // CPU speed
-            const cpuLoad = await this.getCpuLoad(); // Calculated CPU load
+            const cpus = os.cpus();
+            const cpuModel = cpus[0].model;
+            const numCores = cpus.length;
+            const cpuUsage = cpus.map((core) => core.times);
+            const cpuLoad = await this.getCpuLoad();
             const isActive = true; // Machine connection status
 
             resolve({
@@ -112,8 +106,9 @@ class SystemMonitorService {
         };
     }
 
+    // Get the CPU load
     getCpuLoad() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             const start = this.cpuAverage(); // Fetch current CPU load
             // Get updated CPU load every 100ms
             setTimeout(() => {

@@ -2,7 +2,6 @@ import express from 'express';
 import {Server} from "socket.io";
 import http from "http";
 import SystemMonitorController from './controllers/systemMonitorController.js';
-import SystemMonitorService from "./services/systemMonitorService.js";
 import {DatabaseService} from "./services/databaseService.js";
 
 const app = express()
@@ -13,8 +12,6 @@ const httpServer = http.createServer(app);
 const controller = new SystemMonitorController();
 const databaseService = new DatabaseService();
 
-let count = 0;
-
 let socket = new Server(httpServer, {
     cors: {
         origin: '*', // Allow all origins
@@ -22,9 +19,8 @@ let socket = new Server(httpServer, {
     transports: ['websocket']
 });
 
-app.get('/', (req, res) => {
-    const controller = new SystemMonitorController();
-    return controller.getSystemData();
+app.get('/health', (req, res) => {
+    res.send('Server is up and running');
 })
 
 const startDataCollection = () => {
@@ -39,34 +35,22 @@ const startDataCollection = () => {
 const startServer = () => {
     startDataCollection();
     httpServer.listen(port, () => {
-        // console.clear();
+        console.clear();
         console.log(`Server running on port ${port}`);
-        console.log(`http://localhost:${port}`);
+        console.log('url:', `http://localhost:${port}`);
+        console.log('ws:', `ws://localhost:${port}`);
+        console.log('Press Ctrl+C to stop');
+        console.log('----------------------------------')
     })
 };
 
-// httpServer.on("error", (e) => {
-//     if (e.code === "EADDRINUSE") {
-//         console.error("Address already in use, retrying in a few seconds...");
-//         setTimeout(() => {
-//             startServer();
-//         }, 3000);
-//     }else{
-//         console.log("Server error", e);
-//     }
-// });
-
 socket.on('connect', (socket) => {
-    console.log('a user connected');
-    socket.emit('user_connected', {message: 'a new client connected'})
-    socket.on('connect_error', (error) => {
-        console.log('A user failed to connect', error);
-    });
+    console.log('a user connected with', 'id:', socket.id);
 })
 
 // on error
 socket.on('error', (error) => {
-    console.log(error);
+    console.error('Socket error:', error);
 });
 
 startServer();

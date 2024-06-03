@@ -6,6 +6,7 @@ export class DatabaseService {
         this.influxDB = new InfluxDB({url: constants.dbHost, token: constants.dbToken})
     }
 
+    // Write data to InfluxDB
     async writeData(data) {
         const writeApi = this.influxDB.getWriteApi(constants.dbOrg, constants.dbBucket)
         const point = new Point('system_data')
@@ -13,27 +14,31 @@ export class DatabaseService {
             .floatField('ram', data.memUsage)
             .timestamp(data.timestamp)
         writeApi.writePoint(point)
-        writeApi.close()
+        await writeApi.close()
     }
 
+    // Read data from InfluxDB
     async readData() {
         const queryApi = this.influxDB.getQueryApi(constants.dbOrg)
         const query = `from(bucket: "${constants.dbBucket}") |> range(start: -1h)`
         const result = []
-        queryApi.queryRows(query, {
-            next(row, tableMeta) {
-                const obj = tableMeta.toObject(row)
-                result.push(obj)
-            },
-            error(error) {
-                console.error(error)
-            },
-            complete() {
-                // console.log(result)
-            }
+        return new Promise((resolve, reject) => {
+            queryApi.queryRows(query, {
+                next(row, tableMeta) {
+                    const obj = tableMeta.toObject(row)
+                    result.push(obj)
+                },
+                error(error) {
+                    reject(error)
+                },
+                complete() {
+                    resolve(result)
+                }
+            })
         })
     }
 
+    // Read last n seconds of data from InfluxDB
     async readLastDataPoints(numberOfSeconds) {
         const queryApi = this.influxDB.getQueryApi(constants.dbOrg)
         const query = `from(bucket: "${constants.dbBucket}") |> range(start: -${numberOfSeconds}s)`
